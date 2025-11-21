@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+
+# Dependency directories
+jspm_packages/
+
+# VS Code
+.vscode/
+
+# Redis dump
+dump.rdb
+*.rdb
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Swagger / Documentation
+swagger-output.json
