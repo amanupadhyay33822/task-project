@@ -209,7 +209,7 @@ paths:
   # USER ROUTE
   ############################################
 
-  /users/profile:
+  /auth/profile:
     get:
       summary: Get logged-in user profile
       tags: [Users]
@@ -249,13 +249,13 @@ paths:
   # TASK ROUTES
   ############################################
 
-  /api/tasks:
+  /tasks:
     post:
       tags:
         - Tasks
       summary: Create a new task
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -301,7 +301,7 @@ paths:
         - Tasks
       summary: Get tasks with filters
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
         - in: query
           name: status
@@ -340,13 +340,13 @@ paths:
         500:
           description: Server error
 
-  /api/tasks/{id}:
+  /tasks/{id}:
     put:
       tags:
         - Tasks
       summary: Update a task
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -386,7 +386,7 @@ paths:
         - Tasks
       summary: Delete a task
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
         - in: path
           name: id
