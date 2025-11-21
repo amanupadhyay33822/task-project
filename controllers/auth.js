@@ -1,6 +1,7 @@
-const { default: Redis } = require("ioredis");
+
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const redis = require("../utils/redis");
 
 exports.register = async (req, res) => {
   try {
@@ -66,7 +67,7 @@ exports.logout = async (req, res) => {
     await User.findByIdAndUpdate(userId, {
       lastLogoutAt: new Date(),
     });
-    await Redis.del(`user:${userId}`);
+    await redis.del(`user:${userId}`);
     return res.status(200).json({
       message: "Logged out successfully. Token is now invalid.",
     });

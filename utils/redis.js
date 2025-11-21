@@ -1,18 +1,20 @@
-const Redis = require("ioredis");
+const { createClient } = require("redis");
+require("dotenv").config(); // make sure dotenv is loaded
 
-// Use IPv4 explicitly to avoid ::1 issues (especially on Windows)
-const redis = new Redis({
-  host: "127.0.0.1",
-  port: 6379,
+const redis = createClient({
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
 });
 
-// Handle connection errors gracefully
-redis.on("error", (err) => {
-  console.error("Redis connection error:", err);
-});
+redis.on("error", (err) => console.error("Redis Client Error", err));
+redis.on("connect", () => console.log("Connected to Redis"));
 
-redis.on("connect", () => {
-  console.log("Connected to Redis successfully");
-});
+(async () => {
+  await redis.connect();
+})();
 
 module.exports = redis;
