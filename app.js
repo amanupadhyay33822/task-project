@@ -1,13 +1,16 @@
 require("dotenv").config();
+
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
-const taskRoutes = require("./routes/Tasks");
+const taskRoutes = require("./routes/task");
 const connectDB = require("./DB/database");
 connectDB()
 const app = express();
+require("./swagger")(app);
 app.use(cors());
 app.use(express.json());
 
