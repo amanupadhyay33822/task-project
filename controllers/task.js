@@ -47,9 +47,7 @@ exports.getTasks = async (req, res) => {
 
     // Manager sees only team tasks
     else if (req.user.role === "MANAGER") {
-      console.log("Manager access",req.user);
       const manager = await User.findById(req.user._id).populate("team");
-      console.log("Manager team:", manager)
       filter.assignedTo = { $in: manager.team.map((u) => u._id) };
     }
 
@@ -64,18 +62,10 @@ exports.getTasks = async (req, res) => {
       if (from) filter.dueDate.$gte = new Date(from);
       if (to) filter.dueDate.$lte = new Date(to);
     }
-
-    const cacheKey = `tasks:${req.user._id}:${JSON.stringify(req.query)}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      return res.json(JSON.parse(cached));
-    }
-
     const tasks = await Task.find(filter)
       .populate("assignedTo", "username email")
       .populate("createdBy", "username email");
 
-    await redis.set(cacheKey, JSON.stringify(tasks), "EX", 600);
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: err.message });
