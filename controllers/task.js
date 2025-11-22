@@ -9,7 +9,7 @@ exports.createTask = async (req, res) => {
 
     // Manager can assign task ONLY to team users
     if (req.user.role === "MANAGER") {
-      const manager = await User.findById(req.user.id).populate("team", "_id");
+      const manager = await User.findById(req.user._id).populate("team", "_id");
       const teamIds = manager.team.map((u) => u._id.toString());
 
       if (!teamIds.includes(assignedTo)) {
@@ -25,7 +25,7 @@ exports.createTask = async (req, res) => {
       dueDate,
       priority,
       assignedTo,
-      createdBy: req.user.id,
+      createdBy: req.user._id,
     });
 
     res.status(201).json(task);
@@ -42,12 +42,14 @@ exports.getTasks = async (req, res) => {
 
     // RBAC: Users only see their assigned tasks
     if (req.user.role === "USER") {
-      filter.assignedTo = req.user.id;
+      filter.assignedTo = req.user._id;
     }
 
     // Manager sees only team tasks
     else if (req.user.role === "MANAGER") {
-      const manager = await User.findById(req.user.id).populate("team");
+      console.log("Manager access",req.user);
+      const manager = await User.findById(req.user._id).populate("team");
+      console.log("Manager team:", manager)
       filter.assignedTo = { $in: manager.team.map((u) => u._id) };
     }
 
@@ -63,7 +65,7 @@ exports.getTasks = async (req, res) => {
       if (to) filter.dueDate.$lte = new Date(to);
     }
 
-    const cacheKey = `tasks:${req.user.id}:${JSON.stringify(req.query)}`;
+    const cacheKey = `tasks:${req.user._id}:${JSON.stringify(req.query)}`;
     const cached = await redis.get(cacheKey);
     if (cached) {
       return res.json(JSON.parse(cached));
@@ -86,11 +88,11 @@ exports.updateTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     if (req.user.role === "MANAGER") {
-      const manager = await User.findById(req.user.id).populate("team");
+      const manager = await User.findById(req.user._id).populate("team");
       const teamIds = manager.team.map((u) => u._id.toString());
 
       if (
-        task.createdBy.toString() !== req.user.id &&
+        task.createdBy.toString() !== req.user._id &&
         !teamIds.includes(task.assignedTo.toString())
       ) {
         return res
@@ -114,11 +116,11 @@ exports.deleteTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     if (req.user.role === "MANAGER") {
-      const manager = await User.findById(req.user.id).populate("team");
+      const manager = await User.findById(req.user._id).populate("team");
       const teamIds = manager.team.map((u) => u._id.toString());
 
       if (
-        task.createdBy.toString() !== req.user.id &&
+        task.createdBy.toString() !== req.user._id &&
         !teamIds.includes(task.assignedTo.toString())
       ) {
         return res

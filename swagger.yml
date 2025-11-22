@@ -402,3 +402,83 @@ paths:
           description: Task not found
         500:
           description: Server error
+
+  /team/add-member:
+    post:
+      tags:
+        - Team Management
+      summary: Add a user to a manager's team
+      description: Allows Admin or the Manager himself to add a user to the manager's team.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - managerId
+                - userId
+              properties:
+                managerId:
+                  type: string
+                  description: ID of the manager
+                  example: "675f5c12ab34ff11c98b22d9"
+                userId:
+                  type: string
+                  description: ID of the user to add in team
+                  example: "675f5d09de18ab10d09a1133"
+      responses:
+        "200":
+          description: Team member added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Team member added
+                  manager:
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Bad Request — Duplicate user or invalid manager
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User already in team
+        "403":
+          description: Unauthorized — Only Admin or the manager can add team members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Not authorized
+        "404":
+          description: Manager or User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Manager or User not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Something went wrong on the server        
